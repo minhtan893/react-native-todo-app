@@ -11,11 +11,17 @@ import {
   View,
   ScrollView,
   TouchableOpacity,
-  TextInput
+  TextInput,
+  Alert
 } from 'react-native';
-
+import Note from './components/note';
 
 export default class App extends Component {
+
+  edit(){
+      Alert.alert('edit');
+  }
+
   render() {
     return (
         <View style={ style.container }>
@@ -23,7 +29,7 @@ export default class App extends Component {
               <Text style={ style.headerText }>Note</Text>
           </View>
           <ScrollView style={ style.scrollView }>
-
+              <Note />
           </ScrollView>
           <View style={ style.footer } >
             <TouchableOpacity style={ style.addNoteButton }>
