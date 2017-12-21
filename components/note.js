@@ -7,6 +7,7 @@ import Swipeout from 'react-native-swipeout';
 export default class Note extends Component{
     constructor(props){
         super(props);
+        
     }
 
     render(){
@@ -32,10 +33,9 @@ export default class Note extends Component{
         }
 
         return(
-            <Swipeout {...swipeoutOpts}> 
+            <Swipeout {...swipeoutOpts  }> 
                 <View style={style.note}>
-                    <Text style={ style.noteText }>fkdlkflds</Text>
-                    <Text style={ style.noteText }>fkdlkflds</Text>
+                    <Text style={ style.noteText }>{ this.props.note }</Text>
                 </View>
         </Swipeout>
          ) 

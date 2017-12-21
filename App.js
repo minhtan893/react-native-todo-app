@@ -12,16 +12,53 @@ import {
   ScrollView,
   TouchableOpacity,
   TextInput,
-  Alert
+  Alert,
+  AsyncStorage
 } from 'react-native';
 import Note from './components/note';
 
 export default class App extends Component {
 
+  constructor(props){
+    super(props);
+    this.state = {
+      notes: []
+    }
+    this.getNotes().then((notes) => {
+        this.setState({
+          notes : notes
+      })
+    });
+  }
+
+  async getNotes(){
+       const value = await AsyncStorage.getItem('@notes:key');
+       console.log('fdfd');
+       if(value) return value;
+       return [];
+  }
+
   edit(){
       Alert.alert('edit');
   }
 
+  renderNotes(){
+    if(this.state.notes.length){
+      return this.state.notes.map((note, index) => {
+         return (<Note key={index} note={note.note} />);
+       });
+    }
+  }
+
+  addNote(){
+    if(this.state.noteText){
+       this.state.notes.push({note: this.state.noteText});
+      //  AsyncStorage.setItem('@notes:key', this.state.notes.toString()).then(() => {
+      //    this.setState({notes: this.state.notes});
+      //  }).catch((err) => console.log(err));
+      this.setState({notes: this.state.notes, noteText : ''});
+    }
+  }
   render() {
     return (
         <View style={ style.container }>
@@ -29,13 +66,13 @@ export default class App extends Component {
               <Text style={ style.headerText }>Note</Text>
           </View>
           <ScrollView style={ style.scrollView }>
-              <Note />
+            {this.renderNotes()}
           </ScrollView>
           <View style={ style.footer } >
-            <TouchableOpacity style={ style.addNoteButton }>
+            <TouchableOpacity style={ style.addNoteButton } onPress = {this.addNote.bind(this)}>
               <Text style={ style.addNoteButtonText }>+</Text>
             </TouchableOpacity>
-            <TextInput style={ style.textInput } placeholderTextColor ="white" underlineColorAndroid="transparent"></TextInput>
+            <TextInput onChangeText={(noteText) => this.setState({noteText})} style={ style.textInput } placeholderTextColor ="white" underlineColorAndroid="transparent" value={this.state.noteText}></TextInput>
           </View>
         </View>
     );
