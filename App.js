@@ -26,7 +26,8 @@ export default class App extends Component {
     super(props);
     this.notes = database.ref('notes');
     this.state = {
-      notes: {}
+      notes: {},
+      edit: false
     }
   }
 
@@ -36,24 +37,49 @@ export default class App extends Component {
     });
   }
  
-  edit(){
-      Alert.alert('edit');
+  edit = (key) =>{
+      this.notes.child(key).once('value', (snapshot) => {
+        this.setState({ 
+          noteText: snapshot.val(),
+          edit: true,
+          key: key  
+        });
+      })
   }
+
+  close = () => {
+    this.setState({
+      key:null,
+      edit: false,
+      noteText: ''
+    })
+  } 
 
   renderNotes(){
     if(Object.keys(this.state.notes).length){
       var notes = this.state.notes;
+      edit = this.edit;
+      close = this.close;
       return Object.keys(notes).map(function(key) {
-        return <Note note={notes[key]} key={key} />
+        return <Note note={notes[key]} key={key} editMethod={edit.bind(this, key) } close ={close.bind(this)} />
     });
     }
   }
 
-  addNote(){
+  save(){
+    if(this.state.edit) this.update();
+    else this.add();
+  }
+  add(){
     if(this.state.noteText){
        this.notes.push(this.state.noteText);
     }
   }
+
+  update(){
+    this.notes.child(this.state.key).set(this.state.noteText);
+  }
+
   render() {
     return (
         <View style={ style.container }>
@@ -64,7 +90,7 @@ export default class App extends Component {
             {this.renderNotes()}
           </ScrollView>
           <View style={ style.footer } >
-            <TouchableOpacity style={ style.addNoteButton } onPress = {this.addNote.bind(this)}>
+            <TouchableOpacity style={ style.addNoteButton } onPress = {this.save.bind(this)}>
               <Text style={ style.addNoteButtonText }>+</Text>
             </TouchableOpacity>
             <TextInput onChangeText={(noteText) => this.setState({noteText})} style={ style.textInput } placeholderTextColor ="white" underlineColorAndroid="transparent" value={this.state.noteText}></TextInput>

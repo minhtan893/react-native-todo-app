@@ -7,13 +7,33 @@ import Swipeout from 'react-native-swipeout';
 export default class Note extends Component{
     constructor(props){
         super(props);
-        
+        this.state = {
+            edit: false
+        }
+    }
+    createStyle = (backgroundColor = '#ffffff') =>{
+        return {
+            backgroundColor: (this.state.edit) ? 'red' : '#ffffff',
+            position: 'relative',
+            padding: 20,
+            paddingRight: 100,
+            borderBottomWidth: 2,
+            borderBottomColor: '#ededed'
+        }
+    }
+    componentWillReceiveProps(nextProps){
+        this.setState({
+            edit: false,
+        })
     }
 
     render(){
         const swipeoutOpts = {
             onOpen: ()=>{
                
+            },
+            onClose : ()=>{
+                this.props.close();
             },
             autoClose: true,
             right:[
@@ -25,17 +45,19 @@ export default class Note extends Component{
                 },
                 {
                     onPress: ()=> {
-                        this.props
+                        this.setState({
+                            edit: true
+                        })
+                       this.props.editMethod();
                     },
                     text: 'Edit', type: 'primary'
                 }
             ]
         }
-
         return(
             <Swipeout {...swipeoutOpts  }> 
-                <View style={style.note}>
-                    <Text style={ style.noteText }>{ this.props.note }</Text>
+                <View style={this.createStyle()} >
+                    <Text style={ style.noteText}>{ this.props.note }</Text>
                 </View>
         </Swipeout>
          ) 
