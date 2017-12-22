@@ -16,47 +16,42 @@ import {
   AsyncStorage
 } from 'react-native';
 import Note from './components/note';
+import firebase from './src/firebase';
+
+const database = firebase.database();
 
 export default class App extends Component {
 
   constructor(props){
     super(props);
+    this.notes = database.ref('notes');
     this.state = {
-      notes: []
+      notes: {}
     }
-    this.getNotes().then((notes) => {
-        this.setState({
-          notes : notes
-      })
+  }
+
+  componentDidMount(){
+    this.notes.on('value', (snapshot) => {
+      this.setState({notes: snapshot.val()})
     });
   }
-
-  async getNotes(){
-       const value = await AsyncStorage.getItem('@notes:key');
-       console.log('fdfd');
-       if(value) return value;
-       return [];
-  }
-
+ 
   edit(){
       Alert.alert('edit');
   }
 
   renderNotes(){
-    if(this.state.notes.length){
-      return this.state.notes.map((note, index) => {
-         return (<Note key={index} note={note.note} />);
-       });
+    if(Object.keys(this.state.notes).length){
+      var notes = this.state.notes;
+      return Object.keys(notes).map(function(key) {
+        return <Note note={notes[key]} key={key} />
+    });
     }
   }
 
   addNote(){
     if(this.state.noteText){
-       this.state.notes.push({note: this.state.noteText});
-      //  AsyncStorage.setItem('@notes:key', this.state.notes.toString()).then(() => {
-      //    this.setState({notes: this.state.notes});
-      //  }).catch((err) => console.log(err));
-      this.setState({notes: this.state.notes, noteText : ''});
+       this.notes.push(this.state.noteText);
     }
   }
   render() {
